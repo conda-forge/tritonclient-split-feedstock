@@ -9,7 +9,7 @@ source:
   sha256: 87a3d2deccc219b063acf873f5b77f82e8eab1d53234744af01f6e72e3413156
 
 build:
-  number: 0
+  number: 1
 
 outputs:
   - name: {{ name }}
@@ -38,6 +38,7 @@ outputs:
       host:
         - python
         - pip
+        - {{ pin_subpackage('tritonclient', exact=True) }}
       run:
         - {{ pin_subpackage('tritonclient', exact=True) }}
         - geventhttpclient>=1.4.4
@@ -56,6 +57,7 @@ outputs:
       host:
         - python
         - pip
+        - {{ pin_subpackage('tritonclient', exact=True) }}
       run:
         - {{ pin_subpackage('tritonclient', exact=True) }}
         - grpcio==1.41.0
