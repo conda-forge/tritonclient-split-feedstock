@@ -1,11 +1,11 @@
-About tritonclient-split
-========================
+About tritonclient-split-feedstock
+==================================
+
+Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/tritonclient-split-feedstock/blob/main/LICENSE.txt)
 
 Home: https://developer.nvidia.com/nvidia-triton-inference-server
 
 Package license: BSD-3-Clause
-
-Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/tritonclient-split-feedstock/blob/main/LICENSE.txt)
 
 Summary: Python client library and utilities for communicating with Triton Inference Server.
 

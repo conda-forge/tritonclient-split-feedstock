@@ -1,15 +1,15 @@
 {% set name = "tritonclient" %}
+{% set version = "2.34.0" %}
 
 package:
   name: {{ name|lower }}-split
-  version: 2.26.0
-
+  version: {{ version }}
 source:
-  url: https://files.pythonhosted.org/packages/38/38/2b67e725374d108e1c00dc9ef4104529a42d32d740ddcabd784cb86c4a17/tritonclient-2.26.0-py3-none-any.whl
-  sha256: 87a3d2deccc219b063acf873f5b77f82e8eab1d53234744af01f6e72e3413156
+  url: https://files.pythonhosted.org/packages/49/4f/3513e96dab662eca882d0f917d7a04a775b13196433ab20d5a45b070cd9b/tritonclient-2.34.0-py3-none-any.whl
+  sha256: 876ff68aba141eeb047fdc1eeeebef42c47126c40cbd3f92b3800c8afe55dbcc
 
 build:
-  number: 1
+  number: 0
 
 outputs:
   - name: {{ name }}
@@ -41,8 +41,8 @@ outputs:
         - {{ pin_subpackage('tritonclient', exact=True) }}
       run:
         - {{ pin_subpackage('tritonclient', exact=True) }}
-        - geventhttpclient>=1.4.4
-        - aiohttp>=3.8.1
+        - geventhttpclient>=1.4.4,<=2.0.2
+        - aiohttp>=3.8.1,<4.0.0
     test:
       imports:
         - tritonclient.http
@@ -60,8 +60,9 @@ outputs:
         - {{ pin_subpackage('tritonclient', exact=True) }}
       run:
         - {{ pin_subpackage('tritonclient', exact=True) }}
-        - grpcio==1.41.0
-        - protobuf>=3.5.0,<3.20
+        - grpcio>=1.41.0
+        - protobuf>=3.5.0,<4
+        - packaging>=14.1
     test:
       imports:
         - tritonclient.grpc
@@ -73,7 +74,7 @@ outputs:
 about:
   home: https://developer.nvidia.com/nvidia-triton-inference-server
   license: BSD-3-Clause
-  license_file: tritonclient-2.26.0.dist-info/LICENSE.txt
+  license_file: tritonclient-{{ version }}.dist-info/LICENSE.txt
   summary: Python client library and utilities for communicating with Triton Inference Server.
 
 extra:
