@@ -5,7 +5,7 @@ package:
   name: {{ name|lower }}-split
   version: {{ version }}
 source:
-  url: https://files.pythonhosted.org/packages/8f/c5/fc44c6febd1d71aac6d51130eb7a0079dc17ae73f5b591eb1c9229e85679/tritonclient-2.35.0-py3-none-any.whl
+  url: https://files.pythonhosted.org/packages/py3/t/tritonclient/tritonclient-{{ version }}-py3-none-any.whl
   sha256: 1dc3ed5a7b1727689a3b4580cd770c2f43ba3337d3c7a140ab5996376bbed737
 
 build:
