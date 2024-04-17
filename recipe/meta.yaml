@@ -23,7 +23,6 @@ outputs:
       run:
         - numpy>=1.19.1
         - python-rapidjson>=0.9.1
-        - cuda-python
     test:
       imports:
         - tritonclient
