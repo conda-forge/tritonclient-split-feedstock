@@ -1,12 +1,12 @@
 {% set name = "tritonclient" %}
-{% set version = "2.37.0.9383150" %}
+{% set version = "2.38.0" %}
 
 package:
   name: {{ name|lower }}-split
   version: {{ version }}
 source:
   url: https://files.pythonhosted.org/packages/py3/t/tritonclient/tritonclient-{{ version }}-py3-none-any.whl
-  sha256: 9b38199e588172cbe8718ad0c059145ecfa7d157ba472eebdf85fbe4dda9d1ba
+  sha256: c472740daa9e211deb26a333e7984cb2a1bf8f075ae70edc587559a28472b948
 
 build:
   number: 0
@@ -23,7 +23,6 @@ outputs:
       run:
         - numpy>=1.19.1
         - python-rapidjson>=0.9.1
-        - cuda-python
     test:
       imports:
         - tritonclient
