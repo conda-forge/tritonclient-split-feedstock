@@ -1,12 +1,12 @@
 {% set name = "tritonclient" %}
-{% set version = "2.49.0" %}
+{% set version = "2.52.0" %}
 
 package:
   name: {{ name|lower }}-split
   version: {{ version }}
 source:
   url: https://files.pythonhosted.org/packages/py3/t/tritonclient/tritonclient-{{ version }}-py3-none-any.whl
-  sha256: 8715c8f82061e9e2d85242c903e72e68c070c6845c0334fa88fc9f44a1904e77
+  sha256: be4d3c1327f70e993f004b996e4cd3d5cd774a036fd513becce8a1d687ee393f
 
 build:
   number: 0
