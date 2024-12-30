@@ -61,7 +61,7 @@ outputs:
         - {{ pin_subpackage('tritonclient', exact=True) }}
       run:
         - {{ pin_subpackage('tritonclient', exact=True) }}
-        - grpcio>=1.41.0
+        - grpcio>=1.67.1
         - protobuf>=3.5.0,<4
         - packaging>=14.1
     test:
