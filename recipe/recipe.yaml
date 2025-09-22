@@ -27,6 +27,7 @@ outputs:
         - python ${{ python_min }}.*
         - pip
         - setuptools
+        - unzip
       run:
         - python >=${{ python_min }}
         - numpy<2,>=1.19.1
@@ -50,6 +51,7 @@ outputs:
         - python ${{ python_min }}.*
         - pip
         - setuptools
+        - unzip
         - ${{ pin_subpackage('tritonclient', exact=True) }}
       run:
         - python >=${{ python_min }}
@@ -73,6 +75,7 @@ outputs:
         - python ${{ python_min }}.*
         - pip
         - setuptools
+        - unzip
         - ${{ pin_subpackage('tritonclient', exact=True) }}
       run:
         - python >=${{ python_min }}
