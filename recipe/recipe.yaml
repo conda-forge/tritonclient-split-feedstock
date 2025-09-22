@@ -40,6 +40,8 @@ outputs:
       name: ${{ name }}-http
     build:
       noarch: python
+      script:
+      - unzip tritonclient-*.whl
     requirements:
       host:
         - python
@@ -58,6 +60,8 @@ outputs:
       name: ${{ name }}-grpc
     build:
       noarch: python
+      script:
+      - unzip tritonclient-*.whl
     requirements:
       host:
         - python
