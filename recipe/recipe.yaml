@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: tritonclient
-  version: 2.60.0
+  version: "2.62.0"
 
 recipe:
   name: ${{ name|lower }}-split
@@ -10,10 +10,10 @@ recipe:
 
 source:
   url: https://files.pythonhosted.org/packages/py3/t/tritonclient/tritonclient-${{ version }}-py3-none-any.whl
-  sha256: 4953bcf0e30bdd2a63960ed5b37f3939df5d9416f0036d1eec0bcec4c42f8928
+  sha256: c64dd3e905ff9688fa9871c6245273ab81ecde42f281f43bc5e31f84c094a4cf
 
 build:
-  number: 1
+  number: 0
 
 outputs:
   - package:
@@ -45,7 +45,7 @@ outputs:
     build:
       noarch: python
       script:
-      - unzip tritonclient-*.whl
+        - unzip tritonclient-*.whl
     requirements:
       host:
         - python ${{ python_min }}.*
@@ -69,7 +69,7 @@ outputs:
     build:
       noarch: python
       script:
-      - unzip tritonclient-*.whl
+        - unzip tritonclient-*.whl
     requirements:
       host:
         - python ${{ python_min }}.*
