@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: tritonclient
-  version: "2.62.0"
+  version: "2.63.0"
 
 recipe:
   name: ${{ name|lower }}-split
@@ -10,7 +10,7 @@ recipe:
 
 source:
   url: https://files.pythonhosted.org/packages/py3/t/tritonclient/tritonclient-${{ version }}-py3-none-any.whl
-  sha256: c64dd3e905ff9688fa9871c6245273ab81ecde42f281f43bc5e31f84c094a4cf
+  sha256: aee07908b87e05338ec2224c4aa6f540d86dc71bfcb6a228b3a37048d63fe5b6
 
 build:
   number: 0
