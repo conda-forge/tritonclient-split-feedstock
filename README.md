@@ -42,31 +42,73 @@ conda config --add channels conda-forge
 conda config --set channel_priority strict
 ```
 
-Once the `conda-forge` channel has been enabled, `tritonclient, tritonclient-grpc, tritonclient-http` can be installed with `conda`:
+How to use
+----------
+
+<details>
+<summary>With conda</summary>
 
 ```
 conda install tritonclient tritonclient-grpc tritonclient-http
 ```
 
-or with `mamba`:
+</details>
+
+<details>
+<summary>With mamba</summary>
 
 ```
 mamba install tritonclient tritonclient-grpc tritonclient-http
 ```
 
-It is possible to list all of the versions of `tritonclient` available on your platform with `conda`:
+</details>
+
+<details>
+<summary>With pixi</summary>
+
+```
+# for adding to your local project
+pixi add tritonclient tritonclient-grpc tritonclient-http
+# for installing globally
+pixi global install tritonclient tritonclient-grpc tritonclient-http
+```
+
+</details>
+
+Search package versions
+-----------------------
+
+It is possible to list all of the versions of `tritonclient` available on your platform:
+
+<details>
+<summary>With conda</summary>
 
 ```
 conda search tritonclient --channel conda-forge
 ```
 
-or with `mamba`:
+</details>
+
+<details>
+<summary>With mamba</summary>
 
 ```
 mamba search tritonclient --channel conda-forge
 ```
 
-Alternatively, `mamba repoquery` may provide more information:
+</details>
+
+<details>
+<summary>With pixi</summary>
+
+```
+pixi search tritonclient --channel conda-forge
+```
+
+</details>
+
+<details>
+<summary>With mamba repoquery, which may provide more information</summary>
 
 ```
 # Search all versions available on your platform:
@@ -78,6 +120,8 @@ mamba repoquery whoneeds tritonclient --channel conda-forge
 # List dependencies of `tritonclient`:
 mamba repoquery depends tritonclient --channel conda-forge
 ```
+
+</details>
 
 
 About conda-forge
