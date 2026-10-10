@@ -15,21 +15,27 @@ source:
     sha256: c48e31f08959e2c0f264fded27b1395b0ba335939118a747223b1852c8f179ea
     target_directory: client
     patches:
+      # Fix shared-library linkage and CMake exports; make static archive installation optional.
       - client-cmake.patch
+      # Allow the conda-forge gRPC/protobuf runtimes used to regenerate Python stubs.
       - client-support-conda-grpc.patch
   - url: https://github.com/triton-inference-server/common/archive/${{ common_rev }}.tar.gz
     sha256: 81e5f9aef14cc70b9c0570e2a465c69d2fdac55ee9c8bc8f729879244cb7a26e
     target_directory: common
     patches:
+      # Control common-library installation/tests and locate the native gRPC code generator.
       - common-cmake.patch
 
 build:
   number: 1
+  skip:
+    - win
 
 outputs:
   - package:
       name: ${{ name }}
     build:
+      # CMake's protobuf object files are build-only; the installed wheel is pure Python.
       noarch: python
       skip:
         - not linux
@@ -40,6 +46,7 @@ outputs:
         - ${{ compiler('cxx') }}
         - ${{ stdlib('c') }}
         - cmake >=3.31.8
+        # Keep native code-generation tools on the same release line as host libgrpc.
         - libgrpc ${{ libgrpc }}.*
         - ninja
       host:
@@ -48,6 +55,7 @@ outputs:
         - setuptools
         - wheel
         - grpcio-tools ${{ libgrpc }}.*
+        - grpcio ${{ libgrpc }}.*
         - libgrpc
         - libprotobuf
         - rapidjson
@@ -57,6 +65,9 @@ outputs:
         - numpy >=1.19.1
         - python-rapidjson >=0.9.1
         - urllib3 >=2.0.7
+      run_constraints:
+        # grpcio-tools requires matching grpcio; generated stubs enforce this full version.
+        - ${{ pin_compatible('grpcio', lower_bound='x.x.x', upper_bound=None) }}
     tests:
       - python:
           imports:
@@ -70,15 +81,11 @@ outputs:
   - package:
       name: ${{ name }}-http
     build:
-      noarch: python
+      noarch: generic
       skip:
         - not linux
     requirements:
-      host:
-        - python ${{ python_min }}.*
-        - ${{ pin_subpackage('tritonclient', exact=True) }}
       run:
-        - python >=${{ python_min }}
         - ${{ pin_subpackage('tritonclient', exact=True) }}
         - aiohttp >=3.8.1,<4.0.0
         - geventhttpclient >=2.3.3
@@ -95,16 +102,13 @@ outputs:
   - package:
       name: ${{ name }}-grpc
     build:
-      noarch: python
+      noarch: generic
       skip:
         - not linux
     requirements:
-      host:
-        - python ${{ python_min }}.*
-        - ${{ pin_subpackage('tritonclient', exact=True) }}
       run:
-        - python >=${{ python_min }}
         - ${{ pin_subpackage('tritonclient', exact=True) }}
+        # tritonclient constrains this further to the generator's resolved patch version.
         - grpcio >=${{ libgrpc }}
         - packaging >=14.1
         - protobuf >=${{ libprotobuf }},<8.0
@@ -128,6 +132,7 @@ outputs:
         - ${{ compiler('cxx') }}
         - ${{ stdlib('c') }}
         - cmake >=3.31.8
+        # grpc_cpp_plugin runs on the build platform and must match host libgrpc.
         - libgrpc ${{ libgrpc }}.*
         - ninja
       host:
@@ -138,6 +143,7 @@ outputs:
         - rapidjson
         - zlib
       run:
+        # The installed json_utils.h exposes RapidJSON types to downstream consumers.
         - rapidjson
       run_exports:
         - ${{ pin_subpackage('libtritonclient', upper_bound='x.x') }}

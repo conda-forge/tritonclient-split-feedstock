@@ -2,6 +2,15 @@
 
 set -ex
 
+"$PYTHON" - "$SRC_DIR/client/src/python/library/requirements/requirements_grpc.txt" <<'PY'
+from importlib.metadata import version
+from pathlib import Path
+import sys
+
+requirements = Path(sys.argv[1])
+requirements.write_text(requirements.read_text().replace("grpcio>=1.82", "grpcio>=" + version("grpcio-tools")))
+PY
+
 cmake ${CMAKE_ARGS} \
   -S "$SRC_DIR/client/src/python" \
   -B build-python \

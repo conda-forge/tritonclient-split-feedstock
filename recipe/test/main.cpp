@@ -1,5 +1,6 @@
 #include <grpc_client.h>
 #include <http_client.h>
+#include <json_utils.h>
 
 #include <memory>
 
