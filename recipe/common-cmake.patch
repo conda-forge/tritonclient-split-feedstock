@@ -1,0 +1,51 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 333e8f9..72973de 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,6 +43,7 @@ option(TRITON_COMMON_ENABLE_PROTOBUF "Build protobuf artifacts" OFF)
+ option(TRITON_COMMON_ENABLE_PROTOBUF_PYTHON "Build protobuf artifacts for python" ON)
+ option(TRITON_COMMON_ENABLE_GRPC "Build grpc artifacts" OFF)
+ option(TRITON_COMMON_ENABLE_JSON "Build json-related libs" ON)
++option(TRITON_COMMON_ENABLE_INSTALL "Install Triton common libraries" ON)
+ 
+ if(TRITON_COMMON_ENABLE_JSON)
+   find_package(RapidJSON CONFIG REQUIRED)
+@@ -165,6 +166,7 @@ endif()
+ # Install
+ #
+ include(GNUInstallDirs)
++if(TRITON_COMMON_ENABLE_INSTALL)
+ set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/TritonCommon)
+ 
+ install(
+@@ -255,3 +257,4 @@ export(
+ )
+ 
+ export(PACKAGE TritonCommon)
++endif()
+diff --git a/protobuf/CMakeLists.txt b/protobuf/CMakeLists.txt
+index 49c2b1a..28ba16a 100644
+--- a/protobuf/CMakeLists.txt
++++ b/protobuf/CMakeLists.txt
+@@ -49,7 +49,7 @@ if(${TRITON_COMMON_ENABLE_PROTOBUF})
+ 
+   set(_PROTOBUF_PROTOC $<TARGET_FILE:protobuf::protoc>)
+   if(${TRITON_COMMON_ENABLE_GRPC})
+-    set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
++    find_program(_GRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin REQUIRED)
+   endif()
+ 
+   add_library(
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index aec32d5..b65e061 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -200,5 +200,7 @@ set_target_properties(
+   PROPERTIES
+     OUTPUT_NAME tritontableprinter
+ )
+ 
+-add_subdirectory(test)
++if(BUILD_TESTING)
++  add_subdirectory(test)
++endif()

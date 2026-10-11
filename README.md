@@ -1,5 +1,5 @@
-About tritonclient-feedstock
-============================
+About tritonclient-split-feedstock
+==================================
 
 Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/tritonclient-split-feedstock/blob/main/LICENSE.txt)
 
@@ -7,18 +7,52 @@ Home: https://developer.nvidia.com/nvidia-triton-inference-server
 
 Package license: BSD-3-Clause
 
-Summary: Python client library and utilities for communicating with Triton Inference Server.
+Summary: C++ and Python clients for communicating with Triton Inference Server
+
+Development: https://github.com/triton-inference-server/client
 
 Current build status
 ====================
 
 
 <table><tr>
-    <td>All platforms:</td>
+    <td>GitHub Actions</td>
     <td>
       <a href="https://github.com/conda-forge/tritonclient-split-feedstock/actions/workflows/conda-build.yml">
         <img src="https://github.com/conda-forge/tritonclient-split-feedstock/actions/workflows/conda-build.yml/badge.svg?event=push&branch=main">
       </a>
+    </td>
+  </tr>
+    
+  <tr>
+    <td>Azure</td>
+    <td>
+      <details>
+        <summary>
+          <a href="https://dev.azure.com/conda-forge/feedstock-builds/_build/latest?definitionId=17709&branchName=main">
+            <img src="https://dev.azure.com/conda-forge/feedstock-builds/_apis/build/status/tritonclient-split-feedstock?branchName=main">
+          </a>
+        </summary>
+        <table>
+          <thead><tr><th>Variant</th><th>Status</th></tr></thead>
+          <tbody><tr>
+              <td>osx_64</td>
+              <td>
+                <a href="https://dev.azure.com/conda-forge/feedstock-builds/_build/latest?definitionId=17709&branchName=main">
+                  <img src="https://dev.azure.com/conda-forge/feedstock-builds/_apis/build/status/tritonclient-split-feedstock?branchName=main&jobName=osx&configuration=osx%20osx_64_" alt="variant">
+                </a>
+              </td>
+            </tr><tr>
+              <td>osx_arm64</td>
+              <td>
+                <a href="https://dev.azure.com/conda-forge/feedstock-builds/_build/latest?definitionId=17709&branchName=main">
+                  <img src="https://dev.azure.com/conda-forge/feedstock-builds/_apis/build/status/tritonclient-split-feedstock?branchName=main&jobName=osx&configuration=osx%20osx_arm64_" alt="variant">
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </details>
     </td>
   </tr>
 </table>
@@ -28,56 +62,101 @@ Current release info
 
 | Name | Downloads | Version | Platforms |
 | --- | --- | --- | --- |
+| [![Conda Recipe](https://img.shields.io/badge/recipe-libtritonclient-green.svg)](https://anaconda.org/conda-forge/libtritonclient) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/libtritonclient.svg)](https://anaconda.org/conda-forge/libtritonclient) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/libtritonclient.svg)](https://anaconda.org/conda-forge/libtritonclient) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/libtritonclient.svg)](https://anaconda.org/conda-forge/libtritonclient) |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-tritonclient-green.svg)](https://anaconda.org/conda-forge/tritonclient) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/tritonclient.svg)](https://anaconda.org/conda-forge/tritonclient) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/tritonclient.svg)](https://anaconda.org/conda-forge/tritonclient) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/tritonclient.svg)](https://anaconda.org/conda-forge/tritonclient) |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-tritonclient--grpc-green.svg)](https://anaconda.org/conda-forge/tritonclient-grpc) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/tritonclient-grpc.svg)](https://anaconda.org/conda-forge/tritonclient-grpc) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/tritonclient-grpc.svg)](https://anaconda.org/conda-forge/tritonclient-grpc) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/tritonclient-grpc.svg)](https://anaconda.org/conda-forge/tritonclient-grpc) |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-tritonclient--http-green.svg)](https://anaconda.org/conda-forge/tritonclient-http) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/tritonclient-http.svg)](https://anaconda.org/conda-forge/tritonclient-http) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/tritonclient-http.svg)](https://anaconda.org/conda-forge/tritonclient-http) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/tritonclient-http.svg)](https://anaconda.org/conda-forge/tritonclient-http) |
 
-Installing tritonclient
-=======================
+Installing tritonclient-split
+=============================
 
-Installing `tritonclient` from the `conda-forge` channel can be achieved by adding `conda-forge` to your channels with:
+Installing `tritonclient-split` from the `conda-forge` channel can be achieved by adding `conda-forge` to your channels with:
 
 ```
 conda config --add channels conda-forge
 conda config --set channel_priority strict
 ```
 
-Once the `conda-forge` channel has been enabled, `tritonclient, tritonclient-grpc, tritonclient-http` can be installed with `conda`:
+How to use
+----------
+
+<details>
+<summary>With conda</summary>
 
 ```
-conda install tritonclient tritonclient-grpc tritonclient-http
+conda install libtritonclient tritonclient tritonclient-grpc tritonclient-http
 ```
 
-or with `mamba`:
+</details>
+
+<details>
+<summary>With mamba</summary>
 
 ```
-mamba install tritonclient tritonclient-grpc tritonclient-http
+mamba install libtritonclient tritonclient tritonclient-grpc tritonclient-http
 ```
 
-It is possible to list all of the versions of `tritonclient` available on your platform with `conda`:
+</details>
+
+<details>
+<summary>With pixi</summary>
 
 ```
-conda search tritonclient --channel conda-forge
+# for adding to your local project
+pixi add libtritonclient tritonclient tritonclient-grpc tritonclient-http
+# for installing globally
+pixi global install libtritonclient tritonclient tritonclient-grpc tritonclient-http
 ```
 
-or with `mamba`:
+</details>
+
+Search package versions
+-----------------------
+
+It is possible to list all of the versions of `libtritonclient` available on your platform:
+
+<details>
+<summary>With conda</summary>
 
 ```
-mamba search tritonclient --channel conda-forge
+conda search libtritonclient --channel conda-forge
 ```
 
-Alternatively, `mamba repoquery` may provide more information:
+</details>
+
+<details>
+<summary>With mamba</summary>
+
+```
+mamba search libtritonclient --channel conda-forge
+```
+
+</details>
+
+<details>
+<summary>With pixi</summary>
+
+```
+pixi search libtritonclient --channel conda-forge
+```
+
+</details>
+
+<details>
+<summary>With mamba repoquery, which may provide more information</summary>
 
 ```
 # Search all versions available on your platform:
-mamba repoquery search tritonclient --channel conda-forge
+mamba repoquery search libtritonclient --channel conda-forge
 
-# List packages depending on `tritonclient`:
-mamba repoquery whoneeds tritonclient --channel conda-forge
+# List packages depending on `libtritonclient`:
+mamba repoquery whoneeds libtritonclient --channel conda-forge
 
-# List dependencies of `tritonclient`:
-mamba repoquery depends tritonclient --channel conda-forge
+# List dependencies of `libtritonclient`:
+mamba repoquery depends libtritonclient --channel conda-forge
 ```
+
+</details>
 
 
 About conda-forge
@@ -121,17 +200,17 @@ Terminology
                   produce the finished article (built conda distributions)
 
 
-Updating tritonclient-feedstock
-===============================
+Updating tritonclient-split-feedstock
+=====================================
 
-If you would like to improve the tritonclient recipe or build a new
+If you would like to improve the tritonclient-split recipe or build a new
 package version, please fork this repository and submit a PR. Upon submission,
 your changes will be run on the appropriate platforms to give the reviewer an
 opportunity to confirm that the changes result in a successful build. Once
 merged, the recipe will be re-built and uploaded automatically to the
 `conda-forge` channel, whereupon the built conda packages will be available for
 everybody to install and use from the `conda-forge` channel.
-Note that all branches in the conda-forge/tritonclient-feedstock are
+Note that all branches in the conda-forge/tritonclient-split-feedstock are
 immediately built and any created packages are uploaded, so PRs should be based
 on branches in forks, and branches in the main repository should only be used to
 build distinct package versions.
@@ -149,4 +228,5 @@ Feedstock Maintainers
 * [@ivergara](https://github.com/ivergara/)
 * [@janjagusch](https://github.com/janjagusch/)
 * [@nick-harmening](https://github.com/nick-harmening/)
+* [@timkpaine](https://github.com/timkpaine/)
 

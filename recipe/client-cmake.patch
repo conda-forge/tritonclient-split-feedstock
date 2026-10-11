@@ -1,0 +1,172 @@
+diff --git a/src/c++/CMakeLists.txt b/src/c++/CMakeLists.txt
+index 848e898..111749c 100644
+--- a/src/c++/CMakeLists.txt
++++ b/src/c++/CMakeLists.txt
+@@ -47,4 +47,5 @@ option(TRITON_USE_THIRD_PARTY "Use local version of third party libraries" ON)
+ option(TRITON_KEEP_TYPEINFO "Keep typeinfo symbols by disabling ldscript" OFF)
+ option(TRITON_ENABLE_ZLIB "Include ZLIB library in build" ON)
++option(TRITON_CLIENT_ENABLE_STATIC_INSTALL "Install static C++ client libraries" ON)
+ 
+ set(TRITON_COMMON_REPO_TAG "main" CACHE STRING "Tag for triton-inference-server/common repo")
+diff --git a/src/c++/library/CMakeLists.txt b/src/c++/library/CMakeLists.txt
+index beeb2e0..10bb21c 100644
+--- a/src/c++/library/CMakeLists.txt
++++ b/src/c++/library/CMakeLists.txt
+@@ -99,15 +99,17 @@ if(TRITON_ENABLE_CC_HTTP OR TRITON_ENABLE_EXAMPLES)
+     )
+   endforeach()
+ 
+-  install(
+-    TARGETS
+-      json_utils_static
+-    EXPORT
+-      triton-client-targets
+-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+-  )
++  if(TRITON_CLIENT_ENABLE_STATIC_INSTALL)
++    install(
++      TARGETS
++        json_utils_static
++      EXPORT
++        triton-client-targets
++      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++    )
++  endif()
+ 
+ endif() # TRITON_ENABLE_CC_HTTP OR TRITON_ENABLE_EXAMPLES
+ 
+@@ -165,15 +167,17 @@ if(NOT WIN32)
+     )
+   endforeach()
+ 
+-  install(
+-    TARGETS
+-      shm_utils_static
+-    EXPORT
+-      triton-client-targets
+-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+-  )
++  if(TRITON_CLIENT_ENABLE_STATIC_INSTALL)
++    install(
++      TARGETS
++        shm_utils_static
++      EXPORT
++        triton-client-targets
++      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++    )
++  endif()
+ endif(NOT WIN32)
+ 
+ if(TRITON_ENABLE_CC_GRPC)
+@@ -422,14 +426,14 @@ if(TRITON_ENABLE_CC_HTTP)
+     TritonClient::httpclient ALIAS httpclient
+   )
+ 
+-  if (NOT WIN32)
++  if (NOT WIN32 AND NOT TRITON_KEEP_TYPEINFO)
+      set_target_properties(
+        httpclient
+        PROPERTIES
+          LINK_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/libhttpclient.ldscript
+          LINK_FLAGS "-Wl,--version-script=libhttpclient.ldscript"
+      )
+-  endif() # NOT WIN32
++  endif() # NOT WIN32 AND NOT TRITON_KEEP_TYPEINFO
+ 
+   target_link_libraries(
+       httpclient
+@@ -438,6 +442,13 @@ if(TRITON_ENABLE_CC_HTTP)
+       PUBLIC Threads::Threads
+   )
+ 
++  if(${TRITON_ENABLE_ZLIB})
++    target_link_libraries(
++      httpclient
++      PRIVATE ZLIB::ZLIB
++    )
++  endif() # TRITON_ENABLE_ZLIB
++
+   foreach(_client_target http-client-library httpclient_static httpclient)
+     target_compile_features(${_client_target} PRIVATE cxx_std_${TRITON_MIN_CXX_STANDARD})
+     target_compile_options(
+@@ -509,14 +520,27 @@ if(TRITON_ENABLE_CC_HTTP OR TRITON_ENABLE_CC_GRPC)
+   if(TRITON_ENABLE_CC_GRPC)
+     install(
+       TARGETS
+         grpcclient
++        proto-library
++        grpc-service-library
++        common-compile-settings
+-        grpcclient_static
+       EXPORT
+         triton-client-targets
+       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+-  )
++    )
++    if(TRITON_CLIENT_ENABLE_STATIC_INSTALL)
++      install(
++        TARGETS
++          grpcclient_static
++        EXPORT
++          triton-client-targets
++        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++      )
++    endif()
+   endif() # TRITON_ENABLE_CC_GRPC
+ 
+   if(TRITON_ENABLE_CC_HTTP)
+@@ -522,13 +543,23 @@ if(TRITON_ENABLE_CC_HTTP OR TRITON_ENABLE_CC_GRPC)
+     install(
+       TARGETS
+         httpclient
+-        httpclient_static
+       EXPORT
+         triton-client-targets
+       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+-  )
++    )
++    if(TRITON_CLIENT_ENABLE_STATIC_INSTALL)
++      install(
++        TARGETS
++          httpclient_static
++        EXPORT
++          triton-client-targets
++        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++      )
++    endif()
+   endif() # TRITON_ENABLE_CC_HTTP
+ 
+   install(
+diff --git a/src/c++/library/cmake/TritonClientConfig.cmake.in b/src/c++/library/cmake/TritonClientConfig.cmake.in
+index 4e70594..872967e 100644
+--- a/src/c++/library/cmake/TritonClientConfig.cmake.in
++++ b/src/c++/library/cmake/TritonClientConfig.cmake.in
+@@ -26,6 +26,12 @@
+ 
+ include(CMakeFindDependencyMacro)
+ 
++find_dependency(Threads)
++find_dependency(CURL)
++find_dependency(ZLIB)
++find_dependency(Protobuf CONFIG)
++find_dependency(gRPC CONFIG)
++
+ get_filename_component(
+   TRITONCLIENT_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH
+ )

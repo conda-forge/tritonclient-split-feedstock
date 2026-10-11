@@ -3,38 +3,71 @@ schema_version: 1
 context:
   name: tritonclient
   version: "2.71.0"
+  client_rev: 67fc23833a2d67edd2840db9f828ca6b75a0336c
+  common_rev: ecb874c3126f9f07810f4900d4e7b088fee5eb8c
 
 recipe:
   name: ${{ name|lower }}-split
   version: ${{ version }}
 
 source:
-  url: https://files.pythonhosted.org/packages/py3/t/tritonclient/tritonclient-${{ version }}-py3-none-any.whl
-  sha256: 64be542d5fe0bec8d9e7e708d8c847c43f13d9bfe1190665a8ed185562011dfc
+  - url: https://github.com/triton-inference-server/client/archive/${{ client_rev }}.tar.gz
+    sha256: c48e31f08959e2c0f264fded27b1395b0ba335939118a747223b1852c8f179ea
+    target_directory: client
+    patches:
+      # Fix shared-library linkage and CMake exports; make static archive installation optional.
+      - client-cmake.patch
+      # Allow the conda-forge gRPC/protobuf runtimes used to regenerate Python stubs.
+      - client-support-conda-grpc.patch
+  - url: https://github.com/triton-inference-server/common/archive/${{ common_rev }}.tar.gz
+    sha256: 81e5f9aef14cc70b9c0570e2a465c69d2fdac55ee9c8bc8f729879244cb7a26e
+    target_directory: common
+    patches:
+      # Control common-library installation/tests and locate the native gRPC code generator.
+      - common-cmake.patch
 
 build:
-  number: 0
-  noarch: python
+  number: 1
+  skip:
+    - win
 
 outputs:
   - package:
       name: ${{ name }}
     build:
+      # CMake's protobuf object files are build-only; the installed wheel is pure Python.
       noarch: python
-      script:
-        file: build_base.sh
+      skip:
+        - not linux
+      script: build_python.sh
     requirements:
+      build:
+        - ${{ compiler('c') }}
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+        - cmake >=3.31.8
+        # Keep native code-generation tools on the same release line as host libgrpc.
+        - libgrpc ${{ libgrpc }}.*
+        - ninja
       host:
         - python ${{ python_min }}.*
         - pip
         - setuptools
-        - unzip
+        - wheel
+        - grpcio-tools ${{ libgrpc }}.*
+        - grpcio ${{ libgrpc }}.*
+        - libgrpc
+        - libprotobuf
+        - rapidjson
       run:
         - python >=${{ python_min }}
         - ml_dtypes <=0.5.4
         - numpy >=1.19.1
         - python-rapidjson >=0.9.1
         - urllib3 >=2.0.7
+      run_constraints:
+        # grpcio-tools requires matching grpcio; generated stubs enforce this full version.
+        - ${{ pin_compatible('grpcio', lower_bound='x.x.x', upper_bound=None) }}
     tests:
       - python:
           imports:
@@ -44,24 +77,19 @@ outputs:
           python_version:
             - ${{ python_min }}.*
             - "*"
+
   - package:
       name: ${{ name }}-http
     build:
-      noarch: python
-      script:
-        - unzip tritonclient-*.whl
+      noarch: generic
+      skip:
+        - not linux
     requirements:
-      host:
-        - python ${{ python_min }}.*
-        - pip
-        - setuptools
-        - unzip
-        - ${{ pin_subpackage('tritonclient', exact=True) }}
       run:
-        - python >=${{ python_min }}
         - ${{ pin_subpackage('tritonclient', exact=True) }}
         - aiohttp >=3.8.1,<4.0.0
         - geventhttpclient >=2.3.3
+        - greenlet <3.4.0
     tests:
       - python:
           imports:
@@ -70,25 +98,20 @@ outputs:
           python_version:
             - ${{ python_min }}.*
             - "*"
+
   - package:
       name: ${{ name }}-grpc
     build:
-      noarch: python
-      script:
-        - unzip tritonclient-*.whl
+      noarch: generic
+      skip:
+        - not linux
     requirements:
-      host:
-        - python ${{ python_min }}.*
-        - pip
-        - setuptools
-        - unzip
-        - ${{ pin_subpackage('tritonclient', exact=True) }}
       run:
-        - python >=${{ python_min }}
         - ${{ pin_subpackage('tritonclient', exact=True) }}
-        - grpcio >=1.63.0,<1.68
+        # tritonclient constrains this further to the generator's resolved patch version.
+        - grpcio >=${{ libgrpc }}
         - packaging >=14.1
-        - protobuf >=5.26.1,<6.0dev
+        - protobuf >=${{ libprotobuf }},<8.0
     tests:
       - python:
           imports:
@@ -98,14 +121,78 @@ outputs:
             - ${{ python_min }}.*
             - "*"
 
+  - package:
+      name: libtritonclient
+    build:
+      skip:
+        - win
+      script: build_cpp.sh
+    requirements:
+      build:
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+        - cmake >=3.31.8
+        # grpc_cpp_plugin runs on the build platform and must match host libgrpc.
+        - libgrpc ${{ libgrpc }}.*
+        - ninja
+      host:
+        - libabseil
+        - libcurl
+        - libgrpc
+        - libprotobuf
+        - rapidjson
+        - zlib
+      run:
+        # The installed json_utils.h exposes RapidJSON types to downstream consumers.
+        - rapidjson
+      run_exports:
+        - ${{ pin_subpackage('libtritonclient', upper_bound='x.x') }}
+    tests:
+      - package_contents:
+          include:
+            - common.h
+            - grpc_client.h
+            - http_client.h
+          lib:
+            - grpcclient
+            - httpclient
+          files:
+            - lib/cmake/TritonClient/TritonClientConfig.cmake
+      - script:
+          - cmake -S test -B test-build -GNinja
+          - cmake --build test-build
+          - test-build/tritonclient-test
+          - test ! -e "$PREFIX/lib/libgrpcclient_static.a"
+          - test ! -e "$PREFIX/lib/libhttpclient_static.a"
+        files:
+          recipe:
+            - test/
+        requirements:
+          build:
+            - ${{ compiler('cxx') }}
+            - ${{ stdlib('c') }}
+          run:
+            - cmake
+            - libabseil
+            - libcurl
+            - libgrpc
+            - libprotobuf
+            - ninja
+            - zlib
+
 about:
   license: BSD-3-Clause
-  license_file: tritonclient-${{ version }}.dist-info/LICENSE.txt
-  summary: Python client library and utilities for communicating with Triton Inference Server.
+  license_file:
+    - client/LICENSE
+    - common/LICENSE
+  summary: C++ and Python clients for communicating with Triton Inference Server
   homepage: https://developer.nvidia.com/nvidia-triton-inference-server
+  repository: https://github.com/triton-inference-server/client
 
 extra:
+  feedstock-name: tritonclient-split
   recipe-maintainers:
     - janjagusch
     - ivergara
     - nick-harmening
+    - timkpaine
