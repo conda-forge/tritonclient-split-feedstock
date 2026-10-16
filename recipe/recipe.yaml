@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: tritonclient
-  version: "2.71.0"
+  version: "2.73.0"
   client_rev: 67fc23833a2d67edd2840db9f828ca6b75a0336c
   common_rev: ecb874c3126f9f07810f4900d4e7b088fee5eb8c
 
@@ -27,7 +27,7 @@ source:
       - common-cmake.patch
 
 build:
-  number: 1
+  number: 0
   skip:
     - win
 
